@@ -1,0 +1,12 @@
+/*
+!/.gitignore
+!/pyproject.toml
+!/src/
+!/tests/
+/src/*
+!/src/quantum_economic_auditor/
+!/src/quantum_economic_auditor/**
+!/tests/**
+**/__pycache__/
+*.py[cod]
+**/.env
