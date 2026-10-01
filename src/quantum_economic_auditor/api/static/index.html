@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Halyx Mission Control</title>
+  <link rel="stylesheet" href="/static/styles.css?v=20260802a">
+</head>
+<body>
+  <div class="shell">
+    <aside class="panel sidebar sidebar-left">
+      <div class="brand">
+        <div class="brand-kicker">Halyx</div>
+        <h1>Protocol Intelligence</h1>
+        <p>Autonomous reconstruction with human supervision.</p>
+      </div>
+
+      <div class="sidebar-block">
+        <div class="section-label">Knowledge ownership</div>
+        <div class="scope-chip-row">
+          <span class="chip chip-private">Private</span>
+          <span class="chip">Organization</span>
+          <span class="chip">Public</span>
+        </div>
+      </div>
+
+      <nav class="nav-list" aria-label="Knowledge navigation">
+        <button data-view="database" class="nav-item active">Protocol Intelligence Database</button>
+        <button data-view="snapshots" class="nav-item">Canonical Protocol Snapshots</button>
+        <button data-view="history" class="nav-item">Historical Reasoning Database</button>
+        <button data-view="knowledge" class="nav-item">Audit Knowledge Repository</button>
+        <button data-view="timeline" class="nav-item">Protocol Evolution Timeline</button>
+        <button data-view="patterns" class="nav-item">Pattern Library</button>
+        <button data-view="concepts" class="nav-item">Concept Registry</button>
+      </nav>
+    </aside>
+
+    <main class="panel mission-control">
+      <header class="mission-header">
+        <div>
+          <div class="section-label">Audit mission control</div>
+          <h2 id="protocol-title">Loading protocol...</h2>
+          <p id="protocol-subtitle" class="muted">Halyx is reconstructing the protocol now.</p>
+          <p id="run-poc-status" class="muted">POC status: not run yet.</p>
+        </div>
+        <div class="scope-chip-row">
+          <button id="run-poc-button-header" class="tab" type="button">Run POC Now</button>
+          <div class="status-pill" id="planner-next-action">Planning...</div>
+        </div>
+      </header>
+
+      <form id="launch-form" class="launch-bar">
+        <div class="launch-fields">
+          <label>
+            <span>Protocol name</span>
+            <input id="launch-target" type="text" placeholder="Raydium, OlympusDAO/olympus-v3, or a contract address" />
+          </label>
+          <label>
+            <span>Scope</span>
+            <input id="launch-scope" type="text" placeholder="Optional scope hint" />
+          </label>
+          <label>
+            <span>Chain</span>
+            <input id="launch-chain" type="text" value="ethereum" />
+          </label>
+          <label>
+            <span>ETHERSCAN_API_KEY</span>
+            <input id="launch-etherscan-api-key" type="password" placeholder="Primary Etherscan API key" />
+          </label>
+          <label>
+            <span>ETHERSCAN_API_KEY_ALT</span>
+            <input id="launch-etherscan-api-key-alt" type="password" placeholder="Alternate Etherscan API key" />
+          </label>
+        </div>
+        <button id="launch-button" class="launch-button" type="submit">Launch protocol</button>
+      </form>
+
+      <form id="env-save-form" class="launch-bar">
+        <div class="launch-fields">
+          <label>
+            <span>Env file</span>
+            <select id="env-file-name">
+              <option value=".env">.env</option>
+              <option value=".env.local">.env.local</option>
+              <option value=".env.deploy">.env.deploy</option>
+              <option value=".env.deploy.local">.env.deploy.local</option>
+            </select>
+          </label>
+          <label>
+            <span>FORK_TEST_RPC_URL</span>
+            <input id="env-fork-test-rpc-url" type="text" value="https://rpc.mevblocker.io" placeholder="Fork RPC URL" />
+          </label>
+          <label>
+            <span>RPC_URL</span>
+            <input id="env-rpc-url" type="text" placeholder="Optional RPC_URL" />
+          </label>
+          <label>
+            <span>ALCHEMY_API_KEY</span>
+            <input id="env-alchemy-api-key" type="text" placeholder="Optional key" />
+          </label>
+          <label>
+            <span>ETHERSCAN_API_KEY</span>
+            <input id="env-etherscan-api-key" type="password" placeholder="Primary Etherscan key" />
+          </label>
+          <label>
+            <span>ETHERSCAN_API_KEY_ALT</span>
+            <input id="env-etherscan-api-key-alt" type="password" placeholder="Alternate Etherscan key" />
+          </label>
+        </div>
+        <button id="env-save-button" class="launch-button" type="submit">Save env for selected run</button>
+      </form>
+
+      <section class="grid-metrics">
+        <article class="metric-card">
+          <div class="metric-label">Pattern</div>
+          <div class="metric-value" id="pattern-label">Unknown</div>
+          <div class="metric-subvalue" id="pattern-confidence">—</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">Coverage</div>
+          <div class="metric-value" id="coverage-value">—</div>
+          <div class="metric-subvalue" id="coverage-details">Awaiting analysis</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">Uncertainty</div>
+          <div class="metric-value" id="uncertainty-score">—</div>
+          <div class="metric-subvalue" id="uncertainty-reason">Next best action pending</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">Consensus</div>
+          <div class="metric-value" id="consensus-label">—</div>
+          <div class="metric-subvalue" id="consensus-confidence">—</div>
+        </article>
+      </section>
+
+      <div class="tab-bar" role="tablist" aria-label="Mission views">
+        <button class="tab active" data-main-tab="summary" role="tab">Summary</button>
+        <button class="tab" data-main-tab="planning" role="tab">Planning</button>
+        <button class="tab" data-main-tab="hypotheses" role="tab">Hypothesis Lab</button>
+        <button class="tab" data-main-tab="tutor" role="tab">Tutor</button>
+        <button class="tab" data-main-tab="knowledge" role="tab">Knowledge</button>
+        <button class="tab" data-main-tab="report" role="tab">Report</button>
+        <button class="tab" data-main-tab="files" role="tab">File Tree</button>
+        <button class="tab" data-main-tab="terminal" role="tab">Terminal</button>
+        <button class="tab" data-main-tab="timeline" role="tab">Timeline</button>
+        <button class="tab" data-main-tab="inspector" role="tab">Inspector</button>
+      </div>
+
+      <section class="tab-panels">
+        <section class="workspace-card active" data-main-panel="summary">
+          <div class="section-label">Summary</div>
+          <div class="summary-grid">
+            <div class="summary-card">
+              <strong>Current action</strong>
+              <p id="next-action-title">Waiting for planner</p>
+              <div id="next-action-reason" class="muted"></div>
+            </div>
+            <div class="summary-card">
+              <strong>Coverage confidence</strong>
+              <p id="summary-coverage">—</p>
+              <div id="summary-coverage-details" class="muted"></div>
+            </div>
+            <div class="summary-card">
+              <strong>Consensus rationale</strong>
+              <p id="consensus-explain">Awaiting consensus explanation.</p>
+              <div id="consensus-gaps" class="muted"></div>
+            </div>
+            <div class="summary-card">
+              <strong>Stage stream</strong>
+              <div id="stage-stream" class="stage-stream"></div>
+            </div>
+            <div class="summary-card">
+              <strong>Bottom activity console</strong>
+              <div id="console-log" class="console-log"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="workspace-card" data-main-panel="planning">
+          <div class="section-label">Planning engine</div>
+          <div id="planning-summary" class="list-stack"></div>
+          <div class="confidence-bar"><span id="next-action-bar"></span></div>
+          <div class="small-grid">
+            <div><span class="small-label">Expected information gain</span><strong id="next-action-gain">—</strong></div>
+            <div><span class="small-label">Uncertainty reduction</span><strong id="next-action-reduction">—</strong></div>
+          </div>
+        </section>
+
+        <section class="workspace-card" data-main-panel="hypotheses">
+          <div class="section-label">Hypothesis lifecycle</div>
+          <div class="scope-chip-row">
+            <button id="run-poc-button" class="tab" type="button">Run POC Now</button>
+          </div>
+          <div id="run-poc-result" class="summary-card">
+            <strong>POC Result</strong>
+            <p class="muted">No POC execution has been triggered in this session.</p>
+          </div>
+          <div id="falsification-execution-summary" class="summary-card"></div>
+          <div id="hypothesis-trace-list" class="list-stack"></div>
+        </section>
+
+        <section class="workspace-card" data-main-panel="tutor">
+          <div class="section-label">Tutor integration</div>
+          <div id="tutor-stream" class="stream-list"></div>
+        </section>
+
+        <section class="workspace-card" data-main-panel="report">
+          <div class="section-label">Audit Report</div>
+          <div class="scope-chip-row">
+            <button id="report-generate-button" class="tab" type="button">Generate / Refresh Report</button>
+            <button id="report-download-button" class="tab" type="button">Download Markdown</button>
+          </div>
+          <div id="report-status" class="muted">Select a run and click Generate.</div>
+          <pre id="report-output" class="code-block" style="white-space:pre-wrap;max-height:72vh;overflow-y:auto;">Report will appear here after generation.</pre>
+        </section>
+
+        <section class="workspace-card" data-main-panel="knowledge">
+          <div class="section-label">Coverage dashboard</div>
+          <div id="coverage-list" class="coverage-list"></div>
+          <div class="section-label">Generated invariants</div>
+          <div id="invariant-list" class="list-stack"></div>
+          <div class="section-label">Hypotheses</div>
+          <div id="hypothesis-list" class="list-stack"></div>
+        </section>
+
+        <section class="workspace-card" data-main-panel="files">
+          <div class="section-label">Run file tree</div>
+          <div class="small-grid">
+            <label>
+              <span class="small-label">Run</span>
+              <select id="run-selector"></select>
+            </label>
+            <label>
+              <span class="small-label">Delete source tree</span>
+              <input id="delete-source-tree" type="checkbox" />
+            </label>
+          </div>
+          <div class="scope-chip-row">
+            <button id="refresh-tree-button" class="tab" type="button">Refresh Tree</button>
+            <button id="delete-run-button" class="tab" type="button">Delete Selected Run</button>
+          </div>
+          <div class="file-workspace">
+            <div>
+              <div class="section-label">Repository Files</div>
+              <div id="file-tree-output" class="code-block file-tree-list">Select a run to load its fetched repository tree.</div>
+            </div>
+            <div>
+              <div class="section-label">POC / File Editor</div>
+              <div id="file-open-path" class="muted">Select a file to open.</div>
+              <textarea id="file-editor" class="file-editor" spellcheck="false" placeholder="Select a file to view or edit content."></textarea>
+              <div class="scope-chip-row">
+                <button id="open-generated-test-button" class="tab" type="button">Open Generated Foundry Test</button>
+                <button id="save-file-button" class="tab" type="button">Save Open File</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="workspace-card" data-main-panel="terminal">
+          <div class="section-label">Run terminal</div>
+          <pre id="terminal-output" class="code-block">Select a run to load launch and pipeline logs.</pre>
+        </section>
+
+        <section class="workspace-card" data-main-panel="timeline">
+          <div class="section-label">Mission timeline</div>
+          <div id="timeline" class="timeline"></div>
+        </section>
+
+        <section class="workspace-card" data-main-panel="inspector">
+          <div class="section-label">Workspace inspector</div>
+          <pre id="inspector-output" class="code-block">Select an artifact to inspect.</pre>
+        </section>
+      </section>
+    </main>
+
+    <aside class="panel sidebar sidebar-right">
+      <div class="section-label">Context inspector</div>
+      <div class="workspace-tabs">
+        <button class="tab active" data-side-tab="inspect">Inspector</button>
+        <button class="tab" data-side-tab="artifacts">Artifacts</button>
+        <button class="tab" data-side-tab="scope">Scope</button>
+      </div>
+
+      <section class="workspace-card active" data-side-panel="inspect">
+        <pre id="sidebar-inspector" class="code-block">Select a protocol object to inspect.</pre>
+      </section>
+
+      <section class="workspace-card" data-side-panel="artifacts">
+        <div class="list-stack" id="artifact-list"></div>
+      </section>
+
+      <section class="workspace-card" data-side-panel="scope">
+        <div class="summary-card">
+          <strong>Ownership</strong>
+          <p>Private, organization, and public promotion remain explicit operator actions.</p>
+        </div>
+        <div class="summary-card">
+          <strong>Dashboard mode</strong>
+          <p>Summary first, details on demand, and launchable protocol runs from typed input.</p>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <script src="/static/app.js?v=20260807a"></script>
+
+  <!-- Assistant panel -->
+  <div id="assistant-panel" class="assistant-panel" aria-label="Halyx Assistant" role="complementary">
+    <div class="assistant-header" id="assistant-drag-handle">
+      <span>Halyx Assistant</span>
+      <button id="assistant-close" class="assistant-close" type="button" aria-label="Close assistant">&times;</button>
+    </div>
+    <div id="assistant-messages" class="assistant-messages"></div>
+    <form id="assistant-form" class="assistant-input-row">
+      <input id="assistant-input" type="text" placeholder="Ask about an error, hypothesis, or scope URL…" autocomplete="off" />
+      <button type="submit" class="launch-button">Send</button>
+    </form>
+  </div>
+  <button id="assistant-toggle" class="assistant-toggle" type="button" title="Open assistant">&#x1F4AC;</button>
+</body>
+</html>
